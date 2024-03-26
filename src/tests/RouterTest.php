@@ -8,7 +8,7 @@ class RouterTest extends TestCase {
 
 	protected function setUp(): void
 	{
-		$this->router = new \App\Router();
+		$this->router = new App\Router();
 	}
 
 	public function testAddRoute() {

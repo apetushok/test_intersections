@@ -7,7 +7,7 @@ use DateTime;
 class Booking {
 	public function __construct(
 		private int $id,
-		private int $patientId,
+		private Patient $patient,
 		private DateTime $bookingDate,
 		private DateTime $startTime,
 		private DateTime $endTime,
@@ -23,12 +23,12 @@ class Booking {
 		$this->id = $id;
 	}
 
-	public function getPatientId(): int {
-		return $this->patientId;
+	public function getPatient(): Patient {
+		return $this->patient;
 	}
 
-	public function setPatientId( int $patientId ): void {
-		$this->patientId = $patientId;
+	public function setPatient( Patient $patient ): void {
+		$this->patient = $patient;
 	}
 
 	public function getBookingDate(): DateTime {

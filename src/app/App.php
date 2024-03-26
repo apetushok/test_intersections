@@ -5,6 +5,8 @@ namespace App;
 use App\Presentation\BookingView;
 use App\Repository\BookingRepository;
 use App\Services\BookingService;
+use PDOException;
+use Exception;
 
 class App {
 
@@ -18,13 +20,25 @@ class App {
 		// Initialize services and dependencies
 		// Any other initialization tasks
 
-		$dsn = 'mysql:host=mysql;dbname=your_database';
-		$username = 'root';
-		$password = 'your_root_password';
+		$config = require_once 'Config/db.php';
 
-		$pdo = Database::getInstance( $dsn, $username, $password );
-		$bookingRepo = new BookingRepository( $pdo );
-		$bookingService = new BookingService( $bookingRepo );
+		try {
+			$pdo = Database::getInstance(
+				$config[ 'db' ][ 'dsn' ],
+				$config[ 'db' ][ 'username' ],
+				$config[ 'db' ][ 'password' ]
+			);
+			$bookingRepo = new BookingRepository( $pdo );
+			$bookingService = new BookingService( $bookingRepo );
+		} catch ( PDOException $e) {
+			http_response_code( 500 );
+			echo 'Db error: ' . $e->getMessage(); // TODO remove for prod and add logs instead
+			exit();
+		} catch ( Exception $e ) {
+			http_response_code( 500 );
+			echo 'Error: ' . $e->getMessage(); // TODO remove for prod and add logs instead
+			exit();
+		}
 
 		$router = new Router();
 
@@ -35,10 +49,9 @@ class App {
 		$router->addRoute( 'GET', '/conflicting-bookings', function () use ( $bookingService ) {
 			try {
 				$bookings = $bookingService->getAllTimeLapseBookings( (string)$_GET[ 'date' ] );
-				BookingView::displayAllBookingsView( $bookings ); //TODO use twig or something else
+				BookingView::displayAllBookingsView( $bookings, (string)$_GET[ 'date' ] );
 			} catch ( \Throwable $e ){
-				echo $e->getMessage();
-				//TODO log errors
+				echo $e->getMessage(); // TODO remove for prod and add logs instead
 			}
 		} );
 

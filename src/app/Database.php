@@ -19,4 +19,8 @@ class Database {
 		}
 		return self::$instance->pdo;
 	}
+
+	public function __clone() {}
+
+	public function __wakeup() {}
 }

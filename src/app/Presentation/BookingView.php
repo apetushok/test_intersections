@@ -3,37 +3,52 @@
 namespace App\Presentation;
 
 class BookingView {
-	public static function displayAllBookingsView( $bookings ) {
+	public static function displayAllBookingsView( array $bookings, string $date ) {
 		?>
 		<!DOCTYPE html>
 		<html lang="en">
 		<head>
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-			<title>All Bookings</title>
+			<title>Conflicting Bookings</title>
+            <style>
+				table {
+					border-collapse: collapse;
+				}
+				th, td {
+					border: 1px solid #dcdcdc;
+					padding: 8px;
+					text-align: left;
+				}
+				th {
+					background-color: #f2f2f2;
+				}
+            </style>
 		</head>
 		<body>
-		<h1>All Bookings</h1>
+		<h3>
+            <?php if( $bookings === [] ): ?>
+                There is no conflicting bookings
+            <?php else: ?>
+                There are <?php echo count( $bookings ); ?> conflicting bookings on <?php self::print( $date ); ?>
+			<?php endif; ?>
+        </h3>
 		<table>
 			<thead>
 			<tr>
-				<th>ID</th>
-				<th>Patient ID</th>
-				<th>Booking Date</th>
-				<th>Start Time</th>
-				<th>End Time</th>
+				<th>Time</th>
+				<th>Patient</th>
+				<th>Mobile phone number</th>
 				<th>Comment</th>
 			</tr>
 			</thead>
 			<tbody>
 			<?php foreach ($bookings as $booking): ?>
 				<tr>
-					<td><?php echo $booking->getId(); ?></td>
-					<td><?php echo $booking->getPatientId(); ?></td>
-					<td><?php echo $booking->getBookingDate()->format('Y-m-d'); ?></td>
-					<td><?php echo $booking->getStartTime()->format('H:i'); ?></td>
-					<td><?php echo $booking->getEndTime()->format('H:i'); ?></td>
-					<td><?php echo $booking->getComment(); ?></td>
+                    <td><?php self::print( $booking->getStartTime()->format('H:i') ); ?> - <?php self::print( $booking->getEndTime()->format('H:i') ); ?></td>
+                    <td><?php self::print( $booking->getPatient()->getName() ); ?></td>
+					<td><?php self::print( $booking->getPatient()->getMobilePhone() ); ?></td>
+					<td><?php self::print( $booking->getComment() ); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
@@ -42,4 +57,13 @@ class BookingView {
 		</html>
 		<?php
 	}
+
+    private static function print( string $input ): void {
+		echo self::escape($input);
+    }
+
+	private static function escape( string $input ): string {
+		return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+	}
+
 }
